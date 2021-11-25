@@ -61,6 +61,12 @@ def getBlock(self, game_state: GameState, m, n):
     return block
 
 def isEmpty(self, game_state: GameState, m, n):
+    """
+    Checks if current coordinate is empty (has value 0).
+    @param game_state: The current game state of type GameState
+    @param m: A row value in the range [0, ..., N)
+    @param n: A column value in the range [0, ..., N)
+    """
     if game_state.board.get(m, n) == 0:
         return True
     else:
