@@ -45,7 +45,7 @@ class Tree:
                 parent_node.add_child(node)
 
 
-# This is more for form than for functionality, could honestly be turned into loose functions like helperFunctions.py
+# This is more for form than for functionality, could honestly be turned into loose functions like helper_functions.py
 class ABSearch:
     def __init__(self, tree: Tree):
         self.tree = tree
@@ -65,7 +65,7 @@ class ABSearch:
         alpha = -999999999
         beta = 999999999
 
-        possible_moves = self.get_children(root_node)
+        possible_moves = get_children(root_node)
         for move in possible_moves:
             score = self.min_beta(move, alpha, beta)
             if score > alpha:
@@ -73,11 +73,11 @@ class ABSearch:
         return alpha
 
     def min_beta(self, node: Node, alpha, beta):
-        if self.is_leaf(node):
-            return self.node_score(node)
+        if is_leaf(node):
+            return node_score(node)
         else:
             score = 999999999
-            possible_moves = self.get_children(node)
+            possible_moves = get_children(node)
             for move in possible_moves:
                 score = min(score, self.max_alpha(move, alpha, beta))
                 if score <= alpha:
@@ -87,11 +87,11 @@ class ABSearch:
         return score
 
     def max_alpha(self, node: Node, alpha, beta):
-        if self.is_leaf(node):
-            return self.node_score(node)
+        if is_leaf(node):
+            return node_score(node)
         else:
             score = -999999999
-            possible_moves = self.get_children(node)
+            possible_moves = get_children(node)
             for move in possible_moves:
                 score = max(score, self.min_beta(move, alpha, beta))
                 if score >= beta:
@@ -100,11 +100,14 @@ class ABSearch:
 
         return score
 
-    def get_children(self, node: Node):
-        return node.children
 
-    def is_leaf(self, node: Node):
-        return node.children == []
+def get_children(node: Node):
+    return node.children
 
-    def node_score(self, node: Node):
-        return node.score
+
+def is_leaf(node: Node):
+    return node.children == []
+
+
+def node_score(node: Node):
+    return node.score
