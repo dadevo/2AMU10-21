@@ -38,6 +38,7 @@ def check_legal_region(board: SudokuBoard, m, n, value):
     @param board: A sudoku board. It contains the current position of a game.
     @param m: A row value in the range [0, ..., N).
     @param n: A column value in the range [0, ..., N).
+    @param value: The number that we want to put on the board
     """
     row_region_index = (m // board.m) * board.m
     column_region_index = (n // board.n) * board.n
@@ -102,5 +103,5 @@ def calculate_new_game_state(game_state: GameState, move: Move):
     new_game_state = copy.deepcopy(game_state)
     new_game_state.board.put(move.i, move.j, move.value)
     new_game_state.moves.append(move)
-    #TODO: Does not update potential gamestate scores, it's not needed yet but might want to look into that
+    # TODO: Does not update potential GameState scores, it's not needed yet but might want to look into that
     return new_game_state
