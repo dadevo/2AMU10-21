@@ -1,4 +1,5 @@
 from competitive_sudoku.sudoku import GameState, Move, SudokuBoard, TabooMove
+import copy
 
 
 def check_legal_row(board: SudokuBoard, m, value):
@@ -95,3 +96,11 @@ def get_legal_moves(game_state: GameState):
                         legal_moves.append(Move(i, j, k))
 
     return legal_moves
+
+
+def calculate_new_game_state(game_state: GameState, move: Move):
+    new_game_state = copy.deepcopy(game_state)
+    new_game_state.board.put(move.i, move.j, move.value)
+    new_game_state.moves.append(move)
+    #TODO: Does not update potential gamestate scores, it's not needed yet but might want to look into that
+    return new_game_state

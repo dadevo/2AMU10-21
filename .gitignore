@@ -137,4 +137,7 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
+# other random bullshit :)
 *.pyc
+.idea/2AMU10-21.iml
+*.xml
