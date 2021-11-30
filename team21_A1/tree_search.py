@@ -7,7 +7,7 @@ class Node:
         self.score = score
         self.move = move
         self.game_state = game_state
-        self.max = max  # True = max, False = min
+        self.max = max  # True = max, False = min    #TODO: Currently not used, is done in AB-searching
         self.father = father
         self.children = []
 
@@ -37,7 +37,6 @@ class Tree:
                         max=not parent_node.max, father=parent_node)
             parent_node.add_child(node)
             self.next_node_id += 1
-
 
 class ABSearch:
     def __init__(self, tree):

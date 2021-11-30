@@ -17,6 +17,8 @@ class SudokuAI(competitive_sudoku.sudokuai.SudokuAI):
     def __init__(self):
         super().__init__()
 
+    # TODO: implement per-depth tree-creation/searching function using Tree and ABSearch in here, using propose_move every depth
+
     # N.B. This is a very naive implementation.
     def compute_best_move(self, game_state: GameState) -> None:
         N = game_state.board.N
