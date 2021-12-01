@@ -36,7 +36,6 @@ class SudokuAI(competitive_sudoku.sudokuai.SudokuAI):
         # Now we start doing search tree stuff and offering a new move every depth
         search_tree = Tree(legal_moves, game_state)
         while True:
-            print("Deepen")
             # Extend the depth of the trees by 1
             search_tree.add_layer()
 

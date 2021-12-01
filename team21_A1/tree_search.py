@@ -1,9 +1,10 @@
 from team21_A1.helper_functions import get_legal_moves, calculate_new_game_state
+from team21_A1.evaluation import evaluate_move
 from competitive_sudoku.sudoku import GameState, Move
 
 
 class Node:
-    def __init__(self, score: int = None, move: Move = None, game_state: GameState = None, father=None, our_move = True):
+    def __init__(self, score: int = None, move: Move = None, game_state: GameState = None, father=None, our_move=True):
         self.score = score
         self.move = move
         self.game_state = game_state
@@ -23,6 +24,9 @@ class Node:
     def node_score(self):
         return self.score
 
+    def evaluate(self):
+        self.score = evaluate_move(self.game_state, self.move, self.our_move, self.score)
+
 
 # There should be a tree for every (currently possible) move, not just one tree for all moves
 # This is both easier, and allows us to check which move is best by accessing the root (instead of through parent)
@@ -30,8 +34,11 @@ class Tree:
     def __init__(self, root_moves, cur_game_state):
         self.root = []
         for cur_move in root_moves:
-            # TODO: Get value of move through eval function
-            self.root.append(Node(score=-123456789, move=cur_move, game_state=cur_game_state))
+            new_game_state = calculate_new_game_state(cur_move, cur_game_state)
+            cur_node = Node(score=0, move=cur_move, game_state=new_game_state)
+            cur_node.evaluate()
+
+            self.root.append(cur_node)
 
     def add_layer(self):
         for node in self.root:
@@ -47,12 +54,12 @@ class Tree:
             possible_moves = get_legal_moves(parent_node.game_state)
 
             for cur_move in possible_moves:
-                cur_game_state = calculate_new_game_state(parent_node.game_state, cur_move)
-                # TODO: Get value of move through eval function
-                cur_score = 0
 
-                node = Node(score=cur_score, move=cur_move, game_state=cur_game_state, father=parent_node)
-                parent_node.add_child(node)
+                cur_game_state = calculate_new_game_state(parent_node.game_state, cur_move)
+                cur_node = Node(score=0, move=cur_move, game_state=cur_game_state, father=parent_node)
+                cur_node.evaluate()
+
+                parent_node.add_child(cur_node)
 
 
 # This is more for form than for functionality, could honestly be turned into loose functions like helper_functions.py
