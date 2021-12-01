@@ -13,6 +13,15 @@ class Node:
     def add_child(self, child):
         self.children.append(child)
 
+    def get_children(self):
+        return self.children
+
+    def is_leaf(self):
+        return self.children == []
+
+    def node_score(self):
+        return self.score
+
 
 # There should be a tree for every (currently possible) move, not just one tree for all moves
 # This is both easier, and allows us to check which move is best by accessing the root (instead of through parent)
@@ -46,68 +55,55 @@ class Tree:
 
 
 # This is more for form than for functionality, could honestly be turned into loose functions like helper_functions.py
-class ABSearch:
-    def __init__(self, tree: Tree):
-        self.tree = tree
+def find_best_move(tree):
+    best_move = None
+    best_score = -987654321
+    for root_node in tree.root:
+        root_node.score = alpha_beta_prune(root_node)
+        if root_node.score > best_score:
+            best_score = root_node.score
+            best_move = root_node.move
 
-    def find_best_move(self):
-        best_move = None
-        best_score = -987654321
-        for root_node in self.tree.root:
-            root_node.score = self.alpha_beta_prune(root_node)
-            if root_node.score > best_score:
-                best_score = root_node.score
-                best_move = root_node.move
+    return best_move
 
-        return best_move
 
-    def alpha_beta_prune(self, root_node: Node):
-        alpha = -999999999
-        beta = 999999999
+def alpha_beta_prune(root_node: Node):
+    alpha = -999999999
+    beta = 999999999
 
-        possible_moves = get_children(root_node)
+    possible_moves = root_node.get_children()
+    for move in possible_moves:
+        score = min_beta(move, alpha, beta)
+        if score > alpha:
+            alpha = score
+    return alpha
+
+
+def min_beta(node: Node, alpha, beta):
+    if node.is_leaf():
+        return node.node_score()
+    else:
+        score = 999999999
+        possible_moves = node.get_children()
         for move in possible_moves:
-            score = self.min_beta(move, alpha, beta)
-            if score > alpha:
-                alpha = score
-        return alpha
+            score = min(score, max_alpha(move, alpha, beta))
+            if score <= alpha:
+                return score
+            beta = min(beta, score)
 
-    def min_beta(self, node: Node, alpha, beta):
-        if is_leaf(node):
-            return node_score(node)
-        else:
-            score = 999999999
-            possible_moves = get_children(node)
-            for move in possible_moves:
-                score = min(score, self.max_alpha(move, alpha, beta))
-                if score <= alpha:
-                    return score
-                beta = min(beta, score)
-
-        return score
-
-    def max_alpha(self, node: Node, alpha, beta):
-        if is_leaf(node):
-            return node_score(node)
-        else:
-            score = -999999999
-            possible_moves = get_children(node)
-            for move in possible_moves:
-                score = max(score, self.min_beta(move, alpha, beta))
-                if score >= beta:
-                    return score
-                alpha = max(alpha, score)
-
-        return score
+    return score
 
 
-def get_children(node: Node):
-    return node.children
+def max_alpha(node: Node, alpha, beta):
+    if node.is_leaf():
+        return node.node_score()
+    else:
+        score = -999999999
+        possible_moves = node.get_children()
+        for move in possible_moves:
+            score = max(score, min_beta(move, alpha, beta))
+            if score >= beta:
+                return score
+            alpha = max(alpha, score)
 
-
-def is_leaf(node: Node):
-    return node.children == []
-
-
-def node_score(node: Node):
-    return node.score
+    return score
