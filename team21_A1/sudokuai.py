@@ -34,7 +34,6 @@ class SudokuAI(competitive_sudoku.sudokuai.SudokuAI):
         self.propose_move(best_move)
 
         for cur_move in legal_moves[1:]:
-            # TODO: Calculate move score here
             score = evaluate_move(game_state, cur_move, True, initial_scores)
             if score > best_score:
                 best_move = cur_move
