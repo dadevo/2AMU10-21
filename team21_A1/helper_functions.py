@@ -89,7 +89,7 @@ def get_legal_moves(game_state: GameState):
                 continue
             else:
                 # Try all possible values [1, ..., N] for a cell
-                for k in range(game_state.board.N):
+                for k in range(1, game_state.board.N + 1):
                     # If a move is legal append to list of legal moves
                     if is_legal_move(game_state, i, j, k):
                         legal_moves.append(Move(i, j, k))
