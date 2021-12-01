@@ -3,12 +3,13 @@ from competitive_sudoku.sudoku import GameState, Move
 
 
 class Node:
-    def __init__(self, score: int = None, move: Move = None, game_state: GameState = None, father=None):
+    def __init__(self, score: int = None, move: Move = None, game_state: GameState = None, father=None, our_move = True):
         self.score = score
         self.move = move
         self.game_state = game_state
         self.father = father
         self.children = []
+        self.our_move = our_move
 
     def add_child(self, child):
         self.children.append(child)
