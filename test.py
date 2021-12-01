@@ -1,18 +1,59 @@
-from team21_A1.helper_functions import get_legal_moves
-from competitive_sudoku.sudoku import GameState, load_sudoku_from_text
+import unittest
 
-board_text = '''2 2
+
+from team21_A1.helper_functions import get_legal_moves
+from competitive_sudoku.sudoku import GameState, TabooMove, Move, load_sudoku_from_text
+
+board_text_2x2 = '''2 2
     1   2   3   4
     3   4   .   2
     2   1   .   3
     .   .   .   1
 '''
 
-sudoku_board = load_sudoku_from_text(board_text)
-game_state = GameState(sudoku_board, sudoku_board, [], [], [])
-moves = get_legal_moves(game_state)
+board_text_2x2_1 = '''2 2
+    1   2   3   4
+    3   4   1   2
+    2   1   4   3
+    .   3   2   1
+'''
 
-for m in moves:
-    print(m)
 
-# Seems to work, might want to clean this up a bit
+class TestHelperFunction(unittest.TestCase):
+    def test_get_legal_moves_no_taboo(self):
+        sudoku_board = load_sudoku_from_text(board_text_2x2)
+        game_state = GameState(sudoku_board, sudoku_board, [], [], [])
+        moves = get_legal_moves(game_state)
+        expected_moves = [
+            Move(1, 2, 1), 
+            Move(2, 2, 4), 
+            Move(3, 0, 4),
+            Move(3, 1, 3),
+            Move(3, 2, 2),
+            Move(3, 2, 4)
+        ]
+        self.assertEqual(moves, expected_moves)
+
+    def test_get_legal_moves_with_taboo(self):
+        pass
+        sudoku_board = load_sudoku_from_text(board_text_2x2)
+        game_state = GameState(sudoku_board, sudoku_board, [TabooMove(1, 2, 1)], [], [])
+        moves = get_legal_moves(game_state)
+        expected_moves = [
+            Move(2, 2, 4), 
+            Move(3, 0, 4),
+            Move(3, 1, 3),
+            Move(3, 2, 2),
+            Move(3, 2, 4)
+        ]
+        self.assertEqual(moves, expected_moves)
+    
+    def test_get_legal_moves_with_one_move(self):
+        sudoku_board = load_sudoku_from_text(board_text_2x2_1)
+        game_state = GameState(sudoku_board, sudoku_board, [], [], [])
+        moves = get_legal_moves(game_state)
+        expected_moves = [Move(3, 0, 4)]
+        self.assertEqual(moves, expected_moves)
+
+if __name__ == '__main__':
+    unittest.main()
