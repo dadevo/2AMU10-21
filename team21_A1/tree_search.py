@@ -31,11 +31,12 @@ class Node:
 # There should be a tree for every (currently possible) move, not just one tree for all moves
 # This is both easier, and allows us to check which move is best by accessing the root (instead of through parent)
 class Tree:
-    def __init__(self, root_moves, cur_game_state):
+    def __init__(self, root_moves, cur_game_state, init_score):
         self.root = []
+        self.init_score = init_score
         for cur_move in root_moves:
-            new_game_state = calculate_new_game_state(cur_move, cur_game_state)
-            cur_node = Node(score=0, move=cur_move, game_state=new_game_state)
+            new_game_state = calculate_new_game_state(cur_game_state, cur_move)
+            cur_node = Node(score=init_score, move=cur_move, game_state=new_game_state)
             cur_node.evaluate()
 
             self.root.append(cur_node)
@@ -56,7 +57,7 @@ class Tree:
             for cur_move in possible_moves:
 
                 cur_game_state = calculate_new_game_state(parent_node.game_state, cur_move)
-                cur_node = Node(score=0, move=cur_move, game_state=cur_game_state, father=parent_node)
+                cur_node = Node(score=parent_node.score, move=cur_move, game_state=cur_game_state, father=parent_node)
                 cur_node.evaluate()
 
                 parent_node.add_child(cur_node)
