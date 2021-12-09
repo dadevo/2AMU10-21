@@ -64,8 +64,8 @@ class Tree:
                 for cur_move in possible_moves:
 
                     cur_game_state = calculate_new_game_state(parent_node.game_state, cur_move)
-                    cur_node = Node(score=parent_node.score, move=cur_move, game_state=cur_game_state, father=parent_node, our_move=not parent_node.our_move)
-                    cur_node.evaluate()
+                    cur_score = evaluate_move(cur_game_state, cur_move, not parent_node.our_move, parent_node.score)
+                    cur_node = Node(score=cur_score, move=cur_move, game_state=cur_game_state, father=parent_node, our_move=not parent_node.our_move)
 
                     parent_node.add_child(cur_node)
 
@@ -74,7 +74,7 @@ def find_best_move(tree):
     best_node = None
     best_score = -987654321
     for root_node in tree.root:
-        root_node.score = alpha_beta_prune(root_node)
+        root_node.score = min_beta(root_node, -999999999, 999999999)
 
         if root_node.score > best_score:
             best_score = root_node.score
@@ -84,18 +84,6 @@ def find_best_move(tree):
         return
     else:
         return best_node.move
-
-
-def alpha_beta_prune(root_node: Node):
-    alpha = -999999999
-    beta = 999999999
-
-    for node in root_node.get_children():
-        score = min_beta(node, alpha, beta)
-        if score > alpha:
-            alpha = score
-    return alpha
-
 
 def min_beta(node: Node, alpha, beta):
     if node.is_leaf():
