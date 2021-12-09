@@ -105,3 +105,10 @@ def calculate_new_game_state(game_state: GameState, move: Move):
     new_game_state.moves.append(move)
     # TODO: Does not update potential GameState scores, it's not needed yet but might want to look into that
     return new_game_state
+
+
+def is_board_full(board: SudokuBoard):
+    if 0 in board.squares:
+        return False
+    else:
+        return True
