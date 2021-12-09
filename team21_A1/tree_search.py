@@ -2,6 +2,7 @@ from team21_A1.helper_functions import get_legal_moves, calculate_new_game_state
 from team21_A1.evaluation import evaluate_move
 from competitive_sudoku.sudoku import GameState, Move
 
+
 class Node:
     def __init__(self, score: int = None, move: Move = None, game_state: GameState = None, father=None, our_move=True):
         self.score = score
@@ -79,14 +80,16 @@ def find_best_move(tree):
             best_score = root_node.score
             best_node = root_node
     print("Best move score: " + str(best_score))
-    return best_node.move
+    if best_score == -987654321:  # No move found: We have the last move of the game
+        return
+    else:
+        return best_node.move
 
 
 def alpha_beta_prune(root_node: Node):
     alpha = -999999999
     beta = 999999999
 
-    possible_moves = root_node.get_children()
     for node in root_node.get_children():
         score = min_beta(node, alpha, beta)
         if score > alpha:
@@ -101,11 +104,11 @@ def min_beta(node: Node, alpha, beta):
         score = 999999999
         for node in node.get_children():
             score = min(score, max_alpha(node, alpha, beta))
+            beta = min(beta, score)
             if score <= alpha:
                 return score
-            beta = min(beta, score)
 
-    return score
+        return score
 
 
 def max_alpha(node: Node, alpha, beta):
@@ -115,8 +118,8 @@ def max_alpha(node: Node, alpha, beta):
         score = -999999999
         for node in node.get_children():
             score = max(score, min_beta(node, alpha, beta))
+            alpha = max(alpha, score)
             if score >= beta:
                 return score
-            alpha = max(alpha, score)
 
-    return score
+        return score
