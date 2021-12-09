@@ -41,10 +41,16 @@ class SudokuAI(competitive_sudoku.sudokuai.SudokuAI):
 
         # Now we start doing search tree stuff and offering a new move every depth
         search_tree = Tree(legal_moves, game_state, initial_scores)
+        depth = 0
         while True:
+            print("Increasing depth")
+            depth += 1
+            if depth > 15:
+                break
             # Extend the depth of the trees by 1
             search_tree.add_layer()
 
             # Return best move in tree for current depth
             best_move = find_best_move(search_tree)
+
             self.propose_move(best_move)
