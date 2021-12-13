@@ -45,10 +45,8 @@ class SudokuAI(competitive_sudoku.sudokuai.SudokuAI):
         depth = 0
         search_tree.add_layer()
 
-        while depth < 5:
+        while depth < 9:
             depth += 1
-            if depth > 15:
-                break
 
             # Return best move in tree for current depth
             best_move = find_best_move(search_tree)
@@ -57,6 +55,5 @@ class SudokuAI(competitive_sudoku.sudokuai.SudokuAI):
 
             # Extend the depth of the trees by 1 (1 being both our move and the other agents' moves combined)
             # Debugging, ignore: cProfile.runctx('search_tree.add_layer()', None, locals())
-            search_tree.add_layer()
             search_tree.add_layer()
 

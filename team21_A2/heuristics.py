@@ -1,5 +1,6 @@
 from competitive_sudoku.sudoku import SudokuBoard
 
+
 def hidden_twin_exclusion(game_board: SudokuBoard, taboo_moves, moves: list):
     """
     Returns a filtered list of moves using the hidden twin exclusion.
@@ -61,4 +62,22 @@ def hidden_twin_exclusion(game_board: SudokuBoard, taboo_moves, moves: list):
         else:
             filtered_moves.append(move)
 
-    return filtered_moves, taboo_moves
+    return filtered_moves, new_taboo_moves
+
+
+def run_heuristics(game_board: SudokuBoard, taboo_moves, moves):
+    # filtered_moves = []
+    # future_taboo_moves = []
+
+    hf, ht = hidden_twin_exclusion(game_board, taboo_moves, moves)
+    # future_taboo_moves = merge_uniques_in_lists(future_taboo_moves, ht)
+    # filtered_moves = merge_uniques_in_lists(filtered_moves, hf)
+
+    return hf, ht
+
+
+def merge_uniques_in_lists(list1, list2):
+    set1 = set(list1)
+    set2 = set(list2)
+    uniques_2 = set2-set1
+    return list1+list(uniques_2)

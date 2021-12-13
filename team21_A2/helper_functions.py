@@ -1,5 +1,5 @@
 from competitive_sudoku.sudoku import Move, SudokuBoard, TabooMove
-from team21_A2.heuristics import hidden_twin_exclusion
+from team21_A2.heuristics import run_heuristics
 import copy
 
 
@@ -100,7 +100,7 @@ def get_legal_moves(game_board: SudokuBoard, taboo_moves):
                         cur_move = Move(i, j, k)
                         legal_moves.append(cur_move)
 
-    return hidden_twin_exclusion(game_board, taboo_moves, legal_moves)
+    return run_heuristics(game_board, taboo_moves, legal_moves)
 
 
 def calculate_new_game_board(game_board: SudokuBoard, move: Move):
