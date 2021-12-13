@@ -4,9 +4,10 @@
 
 from competitive_sudoku.sudoku import GameState
 import competitive_sudoku.sudokuai
-from team21_A1.helper_functions import get_legal_moves
-from team21_A1.tree_search import Tree, find_best_move
-from team21_A1.evaluation import evaluate_move
+from team21_A2.helper_functions import get_legal_moves
+from team21_A2.tree_search import Tree, find_best_move
+from team21_A2.evaluation import evaluate_move
+# import cProfile
 
 
 class SudokuAI(competitive_sudoku.sudokuai.SudokuAI):
@@ -20,7 +21,7 @@ class SudokuAI(competitive_sudoku.sudokuai.SudokuAI):
     def compute_best_move(self, game_state: GameState) -> None:
 
         # Get all legal moves
-        legal_moves = get_legal_moves(game_state)
+        legal_moves, legal_taboo_moves = get_legal_moves(game_state.board, game_state.taboo_moves)
 
         what_player_are_we = len(game_state.moves) % 2
         if what_player_are_we == 1:
@@ -30,28 +31,32 @@ class SudokuAI(competitive_sudoku.sudokuai.SudokuAI):
 
         # oh god just submit a move who cares about depth searching
         best_move = legal_moves[0]
-        best_score = evaluate_move(game_state, best_move, True, initial_scores)
         self.propose_move(best_move)
 
-        for cur_move in legal_moves[1:]:
-            score = evaluate_move(game_state, cur_move, True, initial_scores)
+        best_score = -999
+        for cur_move in legal_moves[0:]:
+            score = evaluate_move(game_state.board, cur_move, True, initial_scores)
             if score > best_score:
                 best_move = cur_move
         self.propose_move(best_move)
 
         # Now we start doing search tree stuff and offering a new move every depth
-        search_tree = Tree(legal_moves, game_state, initial_scores)
+        search_tree = Tree(legal_moves, game_state.taboo_moves, legal_taboo_moves, game_state, initial_scores)
         depth = 0
         search_tree.add_layer()
+
         while depth < 5:
             depth += 1
             if depth > 15:
                 break
-            # Extend the depth of the trees by 1 (1 being both our move and the other agents' moves combined)
-            search_tree.add_layer()
-            search_tree.add_layer()
 
             # Return best move in tree for current depth
             best_move = find_best_move(search_tree)
             print("Best move at tree depth " + str(depth) + " found, increasing depth")
             self.propose_move(best_move)
+
+            # Extend the depth of the trees by 1 (1 being both our move and the other agents' moves combined)
+            # Debugging, ignore: cProfile.runctx('search_tree.add_layer()', None, locals())
+            search_tree.add_layer()
+            search_tree.add_layer()
+

@@ -1,14 +1,14 @@
-from team21_A1.helper_functions import check_legal_column, check_legal_region, check_legal_row
+from team21_A2.helper_functions import check_legal_column, check_legal_region, check_legal_row
 
 
-def evaluate_move(game_state, move, our_move, score):
+def evaluate_move(game_board, move, our_move, score):
 
     count = 0 
-    if check_legal_row(game_state.board, move.i, 0):
+    if check_legal_row(game_board, move.i, 0):
         count += 1
-    if check_legal_column(game_state.board, move.j, 0):
+    if check_legal_column(game_board, move.j, 0):
         count += 1      
-    if check_legal_region(game_state.board, move.i, move.j, 0):
+    if check_legal_region(game_board, move.i, move.j, 0):
         count += 1
 
     if count == 0:
