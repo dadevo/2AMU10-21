@@ -51,11 +51,11 @@ class SudokuAI(competitive_sudoku.sudokuai.SudokuAI):
         search_tree = Tree(legal_moves, game_state.taboo_moves, legal_taboo_move, game_state.board, initial_scores)
 
         # We search up to 9 moves ahead, because more is simply impossible in practice (would take WAY too much time)
-        depth = 0
+        depth = 1
         while depth < 9:
             # We keep extending the search depth and finding the best move using our minimax algorithm until depth 9
             best_move = search_tree.deepen_search()
-            print("Best move at tree depth " + str(depth) + " found, increasing depth")
+            print("Best move at tree depth " + str(depth) + " found, attempting to increase depth")
 
             # After we find the best move for the current depth, we give it to the program so it is saved
             # & we increment the depth variable to keep track of our current depth
