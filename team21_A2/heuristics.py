@@ -74,10 +74,10 @@ def run_heuristics(game_board: SudokuBoard, taboo_moves, moves):
         future_taboo_moves = heuristic_taboo
 
     # We can simply repeat the same process for every heuristic, using the filtered list as input for the new heuristic
-    heuristic_filtered, heuristic_taboo = hidden_twin_exclusion(game_board, taboo_moves, filtered_moves)
-    filtered_moves = heuristic_filtered
-    if future_taboo_moves is not None and heuristic_taboo is not None:
-        future_taboo_moves = heuristic_taboo
+    #heuristic_filtered, heuristic_taboo = hidden_twin_exclusion(game_board, taboo_moves, filtered_moves)
+    #filtered_moves = heuristic_filtered
+    #if future_taboo_moves is not None and heuristic_taboo is not None:
+        #future_taboo_moves = heuristic_taboo
 
     # Once we've used all the heuristics, we return the filtered list of legal moves and a taboo move (if any).
     return filtered_moves, future_taboo_moves

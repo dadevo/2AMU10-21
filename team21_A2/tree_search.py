@@ -75,8 +75,6 @@ class Tree:
         A list of Nodes containing the moves our agent can take, all roots of their own search trees.
     taboo_moves : list
         A list of moves that have been declared Taboo by the Oracle, and will disqualify us if we try them
-    future_taboo_moves : list
-        A list of moves that will be declared Taboo by the Oracle, skipping our turn, but not disqualifying us
     init_score : int
         The score at the start of our turn
 
@@ -89,20 +87,24 @@ class Tree:
     deepen_search()
         Increases the depth of the search tree by 1 for all Nodes in the root, and returns the best move for that depth
     """
-    def __init__(self, root_moves, taboo_moves, future_taboo_moves, cur_game_state, init_score):
+    def __init__(self, root_moves, taboo_moves, future_taboo_move, cur_game_board, init_score):
         self.root = []
         self.taboo_moves = taboo_moves
-        self.future_taboo_moves = future_taboo_moves
         self.init_score = init_score
 
         # After initializing the parameters, we evaluate the possible moves on our turn,
         # and put each in the root list to serve as roots for their own search trees
         for cur_move in root_moves:
-            new_game_board = calculate_new_game_board(cur_game_state.board, cur_move)
+            new_game_board = calculate_new_game_board(cur_game_board, cur_move)
             cur_node = Node(score=init_score, move=cur_move, game_board=new_game_board, our_move=True)
             cur_node.evaluate()
 
             self.root.append(cur_node)
+
+        # We separately add the future_taboo_move, if any, into the list of root moves as well
+        if future_taboo_move is not None:
+            future_taboo_node = Node(score=init_score, move=future_taboo_move, game_board=cur_game_board, our_move=True)
+            self.root.append(future_taboo_node)
 
     def add_children_to_root(self, parent_node: Node):
         """
@@ -128,7 +130,6 @@ class Tree:
                 # Add all possible moves of the current node to the list of children of this node
                 # First we retrieve the list of moves, separating moves that will be declared as taboo by the Oracle
                 non_taboo_moves, future_taboo_move = get_legal_moves(parent_node.game_board, self.taboo_moves)
-
                 for cur_move in non_taboo_moves:
                     # We add all non-future taboo moves by calculating what the effects of that move would look like,
                     # and then putting them into a node and adding it to the list of children of the node that is being deepened.

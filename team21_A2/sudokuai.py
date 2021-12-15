@@ -24,7 +24,7 @@ class SudokuAI(competitive_sudoku.sudokuai.SudokuAI):
         """
 
         # Get all legal moves, split by whether we know that the Oracle will call them taboo (but not disqualify us)
-        legal_moves, legal_taboo_moves = get_legal_moves(game_state.board, game_state.taboo_moves)
+        legal_moves, legal_taboo_move = get_legal_moves(game_state.board, game_state.taboo_moves)
 
         # Check what player we are by the length of the GameStates' list of moves,
         # and calculate how well we are doing based on that and the current score of both players
@@ -48,13 +48,13 @@ class SudokuAI(competitive_sudoku.sudokuai.SudokuAI):
 
         # Now we create a Tree object (which will be used for minimax search trees),
         # and we make it depth 1 (also considering what possibilities our move gives to the opposing player)
-        search_tree = Tree(legal_moves, game_state.taboo_moves, legal_taboo_moves, game_state, initial_scores)
+        search_tree = Tree(legal_moves, game_state.taboo_moves, legal_taboo_move, game_state.board, initial_scores)
 
         # We search up to 9 moves ahead, because more is simply impossible in practice (would take WAY too much time)
         depth = 0
         while depth < 9:
             # We keep extending the search depth and finding the best move using our minimax algorithm until depth 9
-            best_move = search_tree.find_best_move()
+            best_move = search_tree.deepen_search()
             print("Best move at tree depth " + str(depth) + " found, increasing depth")
 
             # After we find the best move for the current depth, we give it to the program so it is saved
