@@ -1,10 +1,12 @@
 from competitive_sudoku.sudoku import SudokuBoard
 
+
 def calculate_region_index(board: SudokuBoard, m, n):
     row_region_index = (m // board.m) * board.m
     column_region_index = (n // board.n) * board.n
 
-    return (row_region_index, column_region_index)
+    return row_region_index, column_region_index
+
 
 def hidden_twin_exclusion(board: SudokuBoard, taboo_moves: list, moves: list):
     """
@@ -45,13 +47,17 @@ def hidden_twin_exclusion(board: SudokuBoard, taboo_moves: list, moves: list):
             if move.value in twins[key]:
                 filtered_moves.append(move)
             else:
-                new_taboo_moves.append(move)
+                if move not in taboo_moves:
+                    new_taboo_moves.append(move)
         else:
             filtered_moves.append(move)
 
-    new_taboo_moves.extend(taboo_moves)
+    if new_taboo_moves == []:
+        new_taboo_result = None
+    else:
+        new_taboo_result = new_taboo_moves[0]
 
-    return filtered_moves, new_taboo_moves
+    return filtered_moves, new_taboo_result
 
 
 def run_heuristics(game_board: SudokuBoard, taboo_moves, moves):
@@ -68,16 +74,11 @@ def run_heuristics(game_board: SudokuBoard, taboo_moves, moves):
 
     # We return a filtered list of legal moves, and a taboo move if one was found by the heuristic,
     # and then update our variables with the result
+    # We can simply repeat the same process for every heuristic, using the filtered list as input for the new heuristic
     heuristic_filtered, heuristic_taboo = hidden_twin_exclusion(game_board, taboo_moves, filtered_moves)
     filtered_moves = heuristic_filtered
-    if future_taboo_moves is not None and heuristic_taboo is not None:
+    if future_taboo_moves is None and heuristic_taboo is not None:
         future_taboo_moves = heuristic_taboo
-
-    # We can simply repeat the same process for every heuristic, using the filtered list as input for the new heuristic
-    #heuristic_filtered, heuristic_taboo = hidden_twin_exclusion(game_board, taboo_moves, filtered_moves)
-    #filtered_moves = heuristic_filtered
-    #if future_taboo_moves is not None and heuristic_taboo is not None:
-        #future_taboo_moves = heuristic_taboo
 
     # Once we've used all the heuristics, we return the filtered list of legal moves and a taboo move (if any).
     return filtered_moves, future_taboo_moves
