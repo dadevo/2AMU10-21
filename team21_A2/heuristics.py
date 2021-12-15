@@ -6,7 +6,7 @@ def calculate_region_index(board: SudokuBoard, m, n):
 
     return (row_region_index, column_region_index)
 
-def hidden_twin_exclusion(board: SudokuBoard, moves: list):
+def hidden_twin_exclusion(board: SudokuBoard, taboo_moves: list, moves: list):
     """
     Returns a filtered list of moves using the hidden twin exclusion.
     @param board: A sudoku board. It contains the current position of a game.
@@ -48,6 +48,8 @@ def hidden_twin_exclusion(board: SudokuBoard, moves: list):
                 new_taboo_moves.append(move)
         else:
             filtered_moves.append(move)
+
+    new_taboo_moves.extend(taboo_moves)
 
     return filtered_moves, new_taboo_moves
 
