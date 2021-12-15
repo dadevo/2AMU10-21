@@ -1,7 +1,6 @@
-from team21_A2.helper_functions import calculate_new_game_board, is_board_full
+from team21_A2.helper_functions import calculate_new_game_board, is_board_full, get_legal_moves
 from team21_A2.evaluation import evaluate_move
 from team21_A2.heuristics.hidden_twin_exclusion import hidden_twin_exclusion
-from team21_A2.heuristics.only_square import only_square
 
 from competitive_sudoku.sudoku import SudokuBoard, Move
 
@@ -237,7 +236,7 @@ def get_heuristic_moves(game_board: SudokuBoard, taboo_moves):
     @param taboo_moves: The list of moves declared taboo by the Oracle
     """
 
-    filtered_moves = only_square(game_board, taboo_moves)
+    filtered_moves = get_legal_moves(game_board, taboo_moves)
     future_taboo_moves = None
 
     # We return a filtered list of legal moves, and a taboo move if one was found by the heuristic,
