@@ -1,4 +1,4 @@
-from competitive_sudoku.sudoku import SudokuBoard
+from competitive_sudoku.sudoku import SudokuBoard, Move
 from team21_A2.helper_functions import check_legal_row, check_legal_region, check_legal_column
 
 
@@ -99,18 +99,21 @@ def missing_value_group(board: SudokuBoard, i, j):
     if group_id == 2:
         value_list = check_region_values(board, i, j)
     complete_list = []
-    for value in range(board.N):
+    for value in range(1, board.N):
         # List of values that should be in a complete group
         complete_list.append(value)
     diff_list = list(set(complete_list) - set(value_list))
     return diff_list
 
 
-def only_square(board: SudokuBoard):
+def only_square(board: SudokuBoard, taboo_moves):
     """"
     Executes a move on the board according to the "only square" rule if it is legal move.
     @param board: A sudoku board. It contains the current position of a Sudoku game.
+    @param taboo_moves: list of moves declared taboo by the Oracle.
     """
+    movelist = []
+
     empty_cells = list_empty_cells(board)
     # Get all empty cells on the board
     for cell in empty_cells:
@@ -121,7 +124,12 @@ def only_square(board: SudokuBoard):
             if (check_legal_column(board, j, value)
                     and check_legal_row(board, i, value)
                     and check_legal_region(board, i, j, value)):
+                move = Move(i, j, value)
+                if move not in taboo_moves:
+                    movelist.append(move)
+
                 # executes the move but we can also just add it to a list
-                board.put(i, j, value)
             else:
                 pass
+
+    return movelist

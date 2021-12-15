@@ -237,7 +237,7 @@ def get_heuristic_moves(game_board: SudokuBoard, taboo_moves):
     @param taboo_moves: The list of moves declared taboo by the Oracle
     """
 
-    filtered_moves = get_legal_moves(game_board, taboo_moves)
+    filtered_moves = only_square(game_board, taboo_moves)
     future_taboo_moves = None
 
     # We return a filtered list of legal moves, and a taboo move if one was found by the heuristic,

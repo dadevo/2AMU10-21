@@ -4,7 +4,6 @@
 
 from competitive_sudoku.sudoku import GameState
 import competitive_sudoku.sudokuai
-from team21_A2.helper_functions import get_legal_moves
 from team21_A2.tree_search import Tree, get_heuristic_moves
 from team21_A2.evaluation import evaluate_move
 
