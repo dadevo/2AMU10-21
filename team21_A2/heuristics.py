@@ -1,15 +1,15 @@
 from competitive_sudoku.sudoku import SudokuBoard
 
-def calculate_region_index(game_board: SudokuBoard, m, n):
-    row_region_index = (m // game_board.board.m) * game_board.board.m
-    column_region_index = (n // game_board.board.n) * game_board.board.n
+def calculate_region_index(board: SudokuBoard, m, n):
+    row_region_index = (m // board.m) * board.m
+    column_region_index = (n // board.n) * board.n
 
     return (row_region_index, column_region_index)
 
-def hidden_twin_exclusion(game_board: SudokuBoard, moves: list):
+def hidden_twin_exclusion(board: SudokuBoard, moves: list):
     """
     Returns a filtered list of moves using the hidden twin exclusion.
-    @param game_board: A sudoku board. It contains the current position of a game.
+    @param board: A sudoku board. It contains the current position of a game.
     @param moves: A list of moves to evaluate.
     """
     filtered_moves = []
@@ -30,7 +30,7 @@ def hidden_twin_exclusion(game_board: SudokuBoard, moves: list):
     for k, v in potential_twins.items():
         for k_, v_ in potential_twins.items():
             # Check if the two positions are not the same and that they are in the same region
-            if k != k_ and calculate_region_index(game_board, k[0], k[1]) == calculate_region_index(game_board, k_[0], k_[1]):
+            if k != k_ and calculate_region_index(board, k[0], k[1]) == calculate_region_index(board, k_[0], k_[1]):
                 intersection = set(v) & set(v_)
                 if len(intersection) == 2:
                     twins[k] = list(intersection)
