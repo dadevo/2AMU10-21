@@ -1,6 +1,8 @@
 from team21_A2.helper_functions import get_legal_moves, calculate_new_game_board, is_board_full
 from team21_A2.evaluation import evaluate_move
-from team21_A2.heuristics import hidden_twin_exclusion, only_square
+from team21_A2.heuristics.hidden_twin_exclusion import hidden_twin_exclusion
+from team21_A2.heuristics.only_square import only_square
+
 from competitive_sudoku.sudoku import SudokuBoard, Move
 
 
