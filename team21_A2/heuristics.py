@@ -1,6 +1,6 @@
 from os import lseek
 from competitive_sudoku.sudoku import SudokuBoard
-from team21_A1.helper_functions import check_legal_row, check_legal_region, check_legal_column
+from team21_A2.helper_functions import check_legal_row, check_legal_region, check_legal_column
 
 def list_empty_cells(board: SudokuBoard):
     """
