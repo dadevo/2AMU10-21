@@ -29,10 +29,8 @@ class Node:
     -------
     add_child(child)
         Adds a Node to the list of children
-
     is_leaf()
         Returns whether the Node has children or not (is a leaf in the search tree)
-
     evaluate()
         Evaluates what score the current board would have (after the move) and saves it in the Node
     """
@@ -129,7 +127,7 @@ class Tree:
             else:
                 # Add all possible moves of the current node to the list of children of this node
                 # First we retrieve the list of moves, separating moves that will be declared as taboo by the Oracle
-                non_taboo_moves, future_taboo_moves = get_legal_moves(parent_node.game_board, self.taboo_moves)
+                non_taboo_moves, future_taboo_move = get_legal_moves(parent_node.game_board, self.taboo_moves)
 
                 for cur_move in non_taboo_moves:
                     # We add all non-future taboo moves by calculating what the effects of that move would look like,
@@ -142,11 +140,12 @@ class Tree:
 
                     parent_node.add_child(cur_node)
 
-                for cur_move in future_taboo_moves:
-                    # We repeat the process with taboo moves while skipping some functions that are unnecessary,
-                    # because with a move declared as taboo nothing actually changes in the GameState
+                if future_taboo_move is not None:
+                    # If we found a move that will be marked as taboo once we play it, we also add that node to the search tree.
+                    # We only have to put in one of these moves, because they are all identical: They just skip our turn.
+                    # We can also skip some functions that are unnecessary because our turn is skipped
                     cur_game_board = parent_node.game_board
-                    cur_node = Node(score=parent_node.score, move=cur_move, game_board=cur_game_board,
+                    cur_node = Node(score=parent_node.score, move=future_taboo_move, game_board=cur_game_board,
                                     father=parent_node, our_move=not parent_node.our_move)
 
                     parent_node.add_child(cur_node)
