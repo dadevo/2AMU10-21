@@ -86,6 +86,7 @@ def missing_value_group(board: SudokuBoard, i, j):
     @param i: An index of a column in the range [0, ..., N]
     """
     group_id = get_smallest_group(board, i, j)
+    # Group id's correspond to which group contains the least empty cells
     if group_id == 0:
         value_list = check_column_values(board, j)
     if group_id == 1:
@@ -119,30 +120,3 @@ def only_square(board: SudokuBoard):
                 board.put(i, j, value)
             else:
                 pass
-
-
-
-
-
-
-
-
- # for row_value in range(i): #check which group has the least empty values
-        #     empty_cells_row = 0
-        #     if is_empty_cell(game_state.board, row_value, j):
-        #         empty_cells_row +=1
-        # for column_value in range(j):
-        #     empty_cells_column = 0
-        #     if is_empty_cell(game_state.board, i, column_value):
-        #         empty_cells_column +=1
-
-        # row_region_index = (i // game_state.board.m) * game_state.board.m
-        # column_region_index = (j // game_state.board.n) * game_state.board.n
-        # for row_index in range(row_region_index, row_region_index + game_state.board.m):
-        #     for column_index in range(column_region_index, column_region_index + game_state.board.n):
-        #         empty_cells_region = 0
-        #         if is_empty_cell(game_state.board, row_index, column_index):
-        #             empty_cells_region +=1
-        # groups = (empty_cells_column, empty_cells_row, empty_cells_region)
-        # # i somehow need to remember what group type was the smallest
-        # smallest_group.append(min(groups))
