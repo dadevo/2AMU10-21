@@ -100,7 +100,7 @@ def get_legal_moves(game_board: SudokuBoard, taboo_moves):
                         cur_move = Move(i, j, k)
                         legal_moves.append(cur_move)
 
-    non_taboo_moves, future_taboo_move = run_heuristics(game_board, taboo_moves, legal_moves)
+    non_taboo_moves, future_taboo_move = run_heuristics(game_board, legal_moves)
     return non_taboo_moves, future_taboo_move
 
 

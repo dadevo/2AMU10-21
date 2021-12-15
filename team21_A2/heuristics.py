@@ -8,14 +8,14 @@ def calculate_region_index(board: SudokuBoard, m, n):
     return row_region_index, column_region_index
 
 
-def hidden_twin_exclusion(board: SudokuBoard, taboo_moves: list, moves: list):
+def hidden_twin_exclusion(board: SudokuBoard, moves: list):
     """
     Returns a filtered list of moves using the hidden twin exclusion.
     @param board: A sudoku board. It contains the current position of a game.
     @param moves: A list of moves to evaluate.
     """
     filtered_moves = []
-    new_taboo_moves = []
+    new_taboo_result = None
     potential_twins = {}
     twins = {}
 
@@ -46,26 +46,21 @@ def hidden_twin_exclusion(board: SudokuBoard, taboo_moves: list, moves: list):
         if key in twins:
             if move.value in twins[key]:
                 filtered_moves.append(move)
-            else:
-                if move not in taboo_moves:
-                    new_taboo_moves.append(move)
+            elif new_taboo_result is not None:
+                # We have found a move that will get rejected by the Oracle and will be placed on the taboo list
+                # This is very valuable, so we store it (But we don't need more than 1)
+                new_taboo_result = move
         else:
             filtered_moves.append(move)
-
-    if new_taboo_moves == []:
-        new_taboo_result = None
-    else:
-        new_taboo_result = new_taboo_moves[0]
 
     return filtered_moves, new_taboo_result
 
 
-def run_heuristics(game_board: SudokuBoard, taboo_moves, moves):
+def run_heuristics(game_board: SudokuBoard, moves):
     """
     Runs the heuristics on the set of all legal moves, separating moves that can solve the Sudoku board from moves that cannot
     Returns a (hopefully) smaller list of legal moves and a single move that the Oracle would identify as taboo
     @param game_board: The current Sudoku board
-    @param taboo_moves: The list of known taboo moves (that will disqualify you)
     @param moves: The list of legal moves (that will not disqualify you)
     """
 
@@ -75,7 +70,7 @@ def run_heuristics(game_board: SudokuBoard, taboo_moves, moves):
     # We return a filtered list of legal moves, and a taboo move if one was found by the heuristic,
     # and then update our variables with the result
     # We can simply repeat the same process for every heuristic, using the filtered list as input for the new heuristic
-    heuristic_filtered, heuristic_taboo = hidden_twin_exclusion(game_board, taboo_moves, filtered_moves)
+    heuristic_filtered, heuristic_taboo = hidden_twin_exclusion(game_board, filtered_moves)
     filtered_moves = heuristic_filtered
     if future_taboo_moves is None and heuristic_taboo is not None:
         future_taboo_moves = heuristic_taboo
