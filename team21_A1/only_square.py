@@ -1,11 +1,10 @@
+from os import lseek
 from competitive_sudoku.sudoku import SudokuBoard
 from team21_A1.helper_functions import check_legal_row, check_legal_region, check_legal_column
 
 def list_empty_cells(board: SudokuBoard):
     """
-    returns a list
-    of coordinates which
-    are empty on the sudokuboard
+    returns a list of coordinates which are empty on the sudokuboard
     @param game_state: A sudoku board. It contains the current position of a game.
     """
     empty_cells = []
@@ -81,7 +80,7 @@ def get_smallest_group(board: SudokuBoard, i, j):
 
 def missing_value_group(board: SudokuBoard, i, j):
     """"
-    Returns a list of possible values we can input in the i,j coordinate
+    Returns the smallest list of possible values we can input in the i,j coordinate
     @param board: A sudoku board. It contains the current position of a game.
     @param i: An index of a row in the range [0, ..., N]
     @param i: An index of a column in the range [0, ..., N]
@@ -100,19 +99,25 @@ def missing_value_group(board: SudokuBoard, i, j):
     diff_list = list(set(complete_list) - set(value_list))
     return diff_list
 
-def only_square(board: SudokuBoard, i , j):
-    """""
-    Returns a list of possible values we can input in the i,j coordinate
+def only_square(board: SudokuBoard):
+    """"
+    Executes a move on the board according to the "only square" rule
+    if it is legal move.
     @param board: A sudoku board. It contains the current position of a game.
     @param i: An index of a row in the range [0, ..., N]
     @param i: An index of a column in the range [0, ..., N]
     """
-    missing_values = missing_value_group(board, i , j)
-    for value in missing_values:
-        if (check_legal_column(board, j, value) == True and check_legal_row(board, i, value) == True and check_legal_region(board, i , j, value) == True):
-            board.put(i, j, value)
-    else:
-        pass
+    empty_cells = list_empty_cells(board)
+    # Get all empty cells on the board
+    for cell in empty_cells:
+        i, j = board.f2rc(cell)
+        missing_values = missing_value_group(board, i, j)
+        # convert them into coordinates and get the smallest list of missing values
+        for value in missing_values:
+            if (check_legal_column(board, j, value) == True and check_legal_row(board, i, value) == True and check_legal_region(board, i , j, value) == True):
+                board.put(i, j, value)
+            else:
+                pass
 
 
 
