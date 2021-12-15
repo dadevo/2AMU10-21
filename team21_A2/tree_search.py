@@ -1,4 +1,4 @@
-from team21_A2.helper_functions import get_legal_moves, calculate_new_game_board, is_board_full
+from team21_A2.helper_functions import calculate_new_game_board, is_board_full
 from team21_A2.evaluation import evaluate_move
 from team21_A2.heuristics.hidden_twin_exclusion import hidden_twin_exclusion
 from team21_A2.heuristics.only_square import only_square

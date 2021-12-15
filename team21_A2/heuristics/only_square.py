@@ -1,5 +1,5 @@
 from competitive_sudoku.sudoku import SudokuBoard, Move
-from team21_A2.helper_functions import check_legal_row, check_legal_region, check_legal_column
+from team21_A2.helper_functions import check_legal_row, check_legal_region, check_legal_column, is_empty_cell
 
 
 # ONLY SQUARE HEURISTIC ##################################################
@@ -9,10 +9,11 @@ def list_empty_cells(board: SudokuBoard):
     @param board: A sudoku board. It contains the current position of a game.
     """
     empty_cells = []
-    for m in range(board.m):
-        for n in range(board.n):
-            if board.get(m, n) == 0:
-                empty_cells.append(board.rc2f(m, n))
+    for x in range(board.N):
+        for y in range(board.N):
+            if is_empty_cell(board, x, y):
+                empty_cells.append(board.rc2f(x, y))
+
     return empty_cells
 
 

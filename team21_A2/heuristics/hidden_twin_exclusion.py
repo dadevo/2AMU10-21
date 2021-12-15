@@ -1,5 +1,6 @@
 from competitive_sudoku.sudoku import SudokuBoard
 
+
 def calculate_region_index(board: SudokuBoard, m, n):
     row_region_index = (m // board.m) * board.m
     column_region_index = (n // board.n) * board.n
