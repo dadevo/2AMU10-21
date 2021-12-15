@@ -1,4 +1,5 @@
-from competitive_sudoku.sudoku import GameState, Move, SudokuBoard, TabooMove
+from competitive_sudoku.sudoku import Move, SudokuBoard, TabooMove
+from team21_A2.heuristics import run_heuristics
 import copy
 
 
@@ -61,53 +62,65 @@ def is_empty_cell(board: SudokuBoard, m, n):
     return board.get(m, n) == 0
 
 
-def is_legal_move(game_state: GameState, m, n, value):
+def is_legal_move(game_board: SudokuBoard, taboo_moves, m, n, value):
     """
     Checks if the current move would disqualify you from the game
-    @param game_state: The current game state of type GameState
+    @param game_board: The current Sudoku board of type SudokuBoard
+    @param taboo_moves: The list of current taboo moves
     @param m: A row value in the range [0, ..., N)
     @param n: A column value in the range [0, ..., N)
     @param value: A value in the range [1, ..., N]
     """
     move = TabooMove(m, n, value)
-    return move not in game_state.taboo_moves and \
-        check_legal_row(game_state.board, m, value) and \
-        check_legal_column(game_state.board, n, value) and \
-        check_legal_region(game_state.board, m, n, value)
+    return move not in taboo_moves and \
+        check_legal_row(game_board, m, value) and \
+        check_legal_column(game_board, n, value) and \
+        check_legal_region(game_board, m, n, value)
 
 
-def get_legal_moves(game_state: GameState):
+def get_legal_moves(game_board: SudokuBoard, taboo_moves):
     """
     A method to calculate all legal moves from a GameState return a list of legal moves.
-    @param game_state: The current game state of type GameState.
+    @param game_board: The current Sudoku board of type SudokuBoard
+    @param taboo_moves: The list of current taboo moves
     """
     legal_moves = []
 
     # Go over all possible index combination of the board
-    for i in range(game_state.board.N):
-        for j in range(game_state.board.N):
+    for i in range(game_board.N):
+        for j in range(game_board.N):
             # if the cell is not empty we can skip evaluating values
-            if not is_empty_cell(game_state.board, i, j):
+            if not is_empty_cell(game_board, i, j):
                 continue
             else:
                 # Try all possible values [1, ..., N] for a cell
-                for k in range(1, game_state.board.N + 1):
+                for k in range(1, game_board.N + 1):
                     # If a move is legal append to list of legal moves
-                    if is_legal_move(game_state, i, j, k):
-                        legal_moves.append(Move(i, j, k))
+                    if is_legal_move(game_board, taboo_moves, i, j, k):
+                        cur_move = Move(i, j, k)
+                        legal_moves.append(cur_move)
 
-    return legal_moves
+    non_taboo_moves, future_taboo_move = run_heuristics(game_board, legal_moves)
+    return non_taboo_moves, future_taboo_move
 
 
-def calculate_new_game_state(game_state: GameState, move: Move):
-    new_game_state = copy.deepcopy(game_state)
-    new_game_state.board.put(move.i, move.j, move.value)
-    new_game_state.moves.append(move)
-    # TODO: Does not update potential GameState scores, it's not needed yet but might want to look into that
-    return new_game_state
+def calculate_new_game_board(game_board: SudokuBoard, move: Move):
+    """
+    Calculates the changes a move would make to the Sudoku board
+    @param game_board: The current Sudoku board of type SudokuBoard
+    @param move: The current move of type Move)
+    """
+    new_game_board = copy.deepcopy(game_board)
+    new_game_board.put(move.i, move.j, move.value)
+    return new_game_board
 
 
 def is_board_full(board: SudokuBoard):
+    """
+    Checks if the board is filled up
+    (so we know we can't make any moves anymore, this eliminates a possible error because of no possible moves)
+    @param board: The current sudoku board of type SudokuBoard
+    """
     if 0 in board.squares:
         return False
     else:

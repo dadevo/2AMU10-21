@@ -1,59 +1,45 @@
-import unittest
+from team21_A2.helper_functions import is_empty_cell, is_legal_move
+from team21_A2.heuristics import hidden_twin_exclusion
+from competitive_sudoku.sudoku import SudokuBoard, Move, load_sudoku_from_text
 
-
-from team21_A1.helper_functions import get_legal_moves
-from competitive_sudoku.sudoku import GameState, TabooMove, Move, load_sudoku_from_text
-
-board_text_2x2 = '''2 2
-    1   2   3   4
-    3   4   .   2
-    2   1   .   3
-    .   .   .   1
+board_text_3x3_random = '''3 3
+   .   .   1   6   8   2   9   3   .
+   9   .   .   .   4   1   .   .   5
+   .   .   .   .   7   9   .   4   .
+   3   1   .   .   .   .   .   8   9
+   7   .   .   1   9   3   .   5   .
+   6   .   4   7   5   8   3   2   1
+   1   4   .   .   .   7   .   .   .
+   .   .   .   .   1   .   8   .   .
+   8   .   .   9   .   5   6   .   4
 '''
 
-board_text_2x2_1 = '''2 2
-    1   2   3   4
-    3   4   1   2
-    2   1   4   3
-    .   3   2   1
-'''
+def get_legal_moves_without_heuristic(game_board: SudokuBoard, taboo_moves):
+    """
+    A method to calculate all legal moves from a GameState return a list of legal moves.
+    @param game_board: The current Sudoku board of type SudokuBoard
+    @param taboo_moves: The list of current taboo moves
+    """
+    legal_moves = []
 
+    # Go over all possible index combination of the board
+    for i in range(game_board.N):
+        for j in range(game_board.N):
+            # if the cell is not empty we can skip evaluating values
+            if not is_empty_cell(game_board, i, j):
+                continue
+            else:
+                # Try all possible values [1, ..., N] for a cell
+                for k in range(1, game_board.N + 1):
+                    # If a move is legal append to list of legal moves
+                    if is_legal_move(game_board, taboo_moves, i, j, k):
+                        cur_move = Move(i, j, k)
+                        legal_moves.append(cur_move)
 
-class TestHelperFunction(unittest.TestCase):
-    def test_get_legal_moves_no_taboo(self):
-        sudoku_board = load_sudoku_from_text(board_text_2x2)
-        game_state = GameState(sudoku_board, sudoku_board, [], [], [])
-        moves = get_legal_moves(game_state)
-        expected_moves = [
-            Move(1, 2, 1), 
-            Move(2, 2, 4), 
-            Move(3, 0, 4),
-            Move(3, 1, 3),
-            Move(3, 2, 2),
-            Move(3, 2, 4)
-        ]
-        self.assertEqual(moves, expected_moves)
+    return legal_moves, taboo_moves
 
-    def test_get_legal_moves_with_taboo(self):
-        pass
-        sudoku_board = load_sudoku_from_text(board_text_2x2)
-        game_state = GameState(sudoku_board, sudoku_board, [TabooMove(1, 2, 1)], [], [])
-        moves = get_legal_moves(game_state)
-        expected_moves = [
-            Move(2, 2, 4), 
-            Move(3, 0, 4),
-            Move(3, 1, 3),
-            Move(3, 2, 2),
-            Move(3, 2, 4)
-        ]
-        self.assertEqual(moves, expected_moves)
-    
-    def test_get_legal_moves_with_one_move(self):
-        sudoku_board = load_sudoku_from_text(board_text_2x2_1)
-        game_state = GameState(sudoku_board, sudoku_board, [], [], [])
-        moves = get_legal_moves(game_state)
-        expected_moves = [Move(3, 0, 4)]
-        self.assertEqual(moves, expected_moves)
-
-if __name__ == '__main__':
-    unittest.main()
+board = load_sudoku_from_text(board_text_3x3_random)
+moves, taboo_moves = get_legal_moves_without_heuristic(board, [])
+new_moves, new_taboo_moves = hidden_twin_exclusion(board, moves)
+print('Original moves\t:', len(moves))
+print('New moves\t:', len(new_moves))

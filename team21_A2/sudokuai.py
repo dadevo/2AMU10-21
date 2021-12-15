@@ -4,9 +4,9 @@
 
 from competitive_sudoku.sudoku import GameState
 import competitive_sudoku.sudokuai
-from team21_A1.helper_functions import get_legal_moves
-from team21_A1.tree_search import Tree, find_best_move
-from team21_A1.evaluation import evaluate_move
+from team21_A2.helper_functions import get_legal_moves
+from team21_A2.tree_search import Tree
+from team21_A2.evaluation import evaluate_move
 
 
 class SudokuAI(competitive_sudoku.sudokuai.SudokuAI):
@@ -18,40 +18,48 @@ class SudokuAI(competitive_sudoku.sudokuai.SudokuAI):
         super().__init__()
 
     def compute_best_move(self, game_state: GameState) -> None:
+        """
+        Sends the move that our agent should play whenever we find a good move
+        @param game_state: The current GameState of the Competitive Sudoku game
+        """
 
-        # Get all legal moves
-        legal_moves = get_legal_moves(game_state)
+        # Get all legal moves, split by whether we know that the Oracle will call them taboo (but not disqualify us)
+        legal_moves, legal_taboo_move = get_legal_moves(game_state.board, game_state.taboo_moves)
 
+        # Check what player we are by the length of the GameStates' list of moves,
+        # and calculate how well we are doing based on that and the current score of both players
         what_player_are_we = len(game_state.moves) % 2
         if what_player_are_we == 1:
             initial_scores = game_state.scores[1]-game_state.scores[0]
         else:
             initial_scores = game_state.scores[0]-game_state.scores[1]
 
-        # oh god just submit a move who cares about depth searching
+        # oh god just submit any move we know of so we won't get disqualified for not having a move
         best_move = legal_moves[0]
-        best_score = evaluate_move(game_state, best_move, True, initial_scores)
         self.propose_move(best_move)
 
-        for cur_move in legal_moves[1:]:
-            score = evaluate_move(game_state, cur_move, True, initial_scores)
+        # Now at least check which move gives us the most points (we are now at the level of the greedy_player agent)
+        best_score = -999
+        for cur_move in legal_moves[0:]:
+            score = evaluate_move(game_state.board, cur_move, True, initial_scores)
             if score > best_score:
                 best_move = cur_move
         self.propose_move(best_move)
 
-        # Now we start doing search tree stuff and offering a new move every depth
-        search_tree = Tree(legal_moves, game_state, initial_scores)
-        depth = 0
-        search_tree.add_layer()
-        while depth < 5:
-            depth += 1
-            if depth > 15:
-                break
-            # Extend the depth of the trees by 1 (1 being both our move and the other agents' moves combined)
-            search_tree.add_layer()
-            search_tree.add_layer()
+        # Now we create a Tree object (which will be used for minimax search trees),
+        # and we make it depth 1 (also considering what possibilities our move gives to the opposing player)
+        search_tree = Tree(legal_moves, game_state.taboo_moves, legal_taboo_move, game_state.board, initial_scores)
 
-            # Return best move in tree for current depth
-            best_move = find_best_move(search_tree)
-            print("Best move at tree depth " + str(depth) + " found, increasing depth")
+        # We search up to 9 moves ahead, because more is simply impossible in practice (would take WAY too much time)
+        depth = 1
+        while depth < 9:
+            # We keep extending the search depth and finding the best move using our minimax algorithm until depth 9
+            best_move = search_tree.deepen_search()
+            print("Best move at tree depth " + str(depth) + " found, attempting to increase depth")
+
+            # After we find the best move for the current depth, we give it to the program so it is saved
+            # & we increment the depth variable to keep track of our current depth
             self.propose_move(best_move)
+            depth += 1
+
+
