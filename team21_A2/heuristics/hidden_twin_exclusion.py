@@ -39,7 +39,7 @@ def hidden_twin_exclusion(board: SudokuBoard, moves: list):
                     twins[k_] = list(intersection)
             else:
                 continue
-    
+
     # Filter out moves using the twins
     for move in moves:
         key = (move.i, move.j)
@@ -54,26 +54,3 @@ def hidden_twin_exclusion(board: SudokuBoard, moves: list):
             filtered_moves.append(move)
 
     return filtered_moves, new_taboo_result
-
-
-def run_heuristics(game_board: SudokuBoard, moves):
-    """
-    Runs the heuristics on the set of all legal moves, separating moves that can solve the Sudoku board from moves that cannot
-    Returns a (hopefully) smaller list of legal moves and a single move that the Oracle would identify as taboo
-    @param game_board: The current Sudoku board
-    @param moves: The list of legal moves (that will not disqualify you)
-    """
-
-    filtered_moves = moves
-    future_taboo_moves = None
-
-    # We return a filtered list of legal moves, and a taboo move if one was found by the heuristic,
-    # and then update our variables with the result
-    # We can simply repeat the same process for every heuristic, using the filtered list as input for the new heuristic
-    heuristic_filtered, heuristic_taboo = hidden_twin_exclusion(game_board, filtered_moves)
-    filtered_moves = heuristic_filtered
-    if future_taboo_moves is None and heuristic_taboo is not None:
-        future_taboo_moves = heuristic_taboo
-
-    # Once we've used all the heuristics, we return the filtered list of legal moves and a taboo move (if any).
-    return filtered_moves, future_taboo_moves

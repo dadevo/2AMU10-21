@@ -4,8 +4,7 @@
 
 from competitive_sudoku.sudoku import GameState
 import competitive_sudoku.sudokuai
-from team21_A2.helper_functions import get_legal_moves
-from team21_A2.tree_search import Tree
+from team21_A2.tree_search import Tree, get_heuristic_moves
 from team21_A2.evaluation import evaluate_move
 
 
@@ -24,7 +23,7 @@ class SudokuAI(competitive_sudoku.sudokuai.SudokuAI):
         """
 
         # Get all legal moves, split by whether we know that the Oracle will call them taboo (but not disqualify us)
-        legal_moves, legal_taboo_move = get_legal_moves(game_state.board, game_state.taboo_moves)
+        legal_moves, legal_taboo_move = get_heuristic_moves(game_state.board, game_state.taboo_moves)
 
         # Check what player we are by the length of the GameStates' list of moves,
         # and calculate how well we are doing based on that and the current score of both players

@@ -1,5 +1,8 @@
-from team21_A2.helper_functions import get_legal_moves, calculate_new_game_board, is_board_full
+from team21_A2.helper_functions import calculate_new_game_board, is_board_full
 from team21_A2.evaluation import evaluate_move
+from team21_A2.heuristics.hidden_twin_exclusion import hidden_twin_exclusion
+from team21_A2.heuristics.only_square import only_square
+
 from competitive_sudoku.sudoku import SudokuBoard, Move
 
 
@@ -129,7 +132,7 @@ class Tree:
             else:
                 # Add all possible moves of the current node to the list of children of this node
                 # First we retrieve the list of moves, separating moves that will be declared as taboo by the Oracle
-                non_taboo_moves, future_taboo_move = get_legal_moves(parent_node.game_board, self.taboo_moves)
+                non_taboo_moves, future_taboo_move = get_heuristic_moves(parent_node.game_board, self.taboo_moves)
                 for cur_move in non_taboo_moves:
                     # We add all non-future taboo moves by calculating what the effects of that move would look like,
                     # and then putting them into a node and adding it to the list of children of the node that is being deepened.
@@ -224,3 +227,26 @@ def max_alpha(node: Node, alpha, beta):
                 return score
             alpha = max(alpha, score)
         return score
+
+
+def get_heuristic_moves(game_board: SudokuBoard, taboo_moves):
+    """
+    Runs the heuristics on the set of all legal moves, separating moves that can solve the Sudoku board from moves that cannot
+    Returns a (hopefully) smaller list of legal moves and a single move that the Oracle would identify as taboo
+    @param game_board: The current Sudoku board
+    @param taboo_moves: The list of moves declared taboo by the Oracle
+    """
+
+    filtered_moves = only_square(game_board, taboo_moves)
+    future_taboo_moves = None
+
+    # We return a filtered list of legal moves, and a taboo move if one was found by the heuristic,
+    # and then update our variables with the result
+    # We can simply repeat the same process for every heuristic, using the filtered list as input for the new heuristic
+    heuristic_filtered, heuristic_taboo = hidden_twin_exclusion(game_board, filtered_moves)
+    filtered_moves = heuristic_filtered
+    if future_taboo_moves is None and heuristic_taboo is not None:
+        future_taboo_moves = heuristic_taboo
+
+    # Once we've used all the heuristics, we return the filtered list of legal moves and a taboo move (if any).
+    return filtered_moves, future_taboo_moves
