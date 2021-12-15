@@ -1,11 +1,12 @@
-from os import lseek
 from competitive_sudoku.sudoku import SudokuBoard
 from team21_A2.helper_functions import check_legal_row, check_legal_region, check_legal_column
 
+
+# ONLY SQUARE HEURISTIC ##################################################
 def list_empty_cells(board: SudokuBoard):
     """
     returns a list of coordinates which are empty on the sudokuboard
-    @param game_state: A sudoku board. It contains the current position of a game.
+    @param board: A sudoku board. It contains the current position of a game.
     """
     empty_cells = []
     for m in range(board.m):
@@ -13,6 +14,7 @@ def list_empty_cells(board: SudokuBoard):
             if board.get(m, n) == 0:
                 empty_cells.append(board.rc2f(m, n))
     return empty_cells
+
 
 def check_column_values(board: SudokuBoard, n):
     """
@@ -27,6 +29,7 @@ def check_column_values(board: SudokuBoard, n):
 
     return column
 
+
 def check_row_values(board: SudokuBoard, m):
     """
     Returns whether a list of values for a row.
@@ -39,6 +42,7 @@ def check_row_values(board: SudokuBoard, m):
         row.append(board.get(m, n))
 
     return row
+
 
 def check_region_values(board: SudokuBoard, m, n):
     """
@@ -58,6 +62,7 @@ def check_region_values(board: SudokuBoard, m, n):
 
     return region
 
+
 def get_smallest_group(board: SudokuBoard, i, j):
     """"
     Returns 0 if there are more squares filled in the column,
@@ -65,7 +70,7 @@ def get_smallest_group(board: SudokuBoard, i, j):
     and 2 if there are more squares filled in the region of a certain index
     @param board: A sudoku board. It contains the current position of a game.
     @param i: An index of a row in the range [0, ..., N]
-    @param i: An index of a column in the range [0, ..., N]
+    @param j: An index of a column in the range [0, ..., N]
     """
     row_list = check_row_values(board, i)
     empty_count_row = row_list.count(0)
@@ -83,7 +88,7 @@ def missing_value_group(board: SudokuBoard, i, j):
     Returns the smallest list of possible values we can input in the i,j coordinate
     @param board: A sudoku board. It contains the current position of a game.
     @param i: An index of a row in the range [0, ..., N]
-    @param i: An index of a column in the range [0, ..., N]
+    @param j: An index of a column in the range [0, ..., N]
     """
     group_id = get_smallest_group(board, i, j)
     # Group id's correspond to which group contains the least empty cells
@@ -100,13 +105,11 @@ def missing_value_group(board: SudokuBoard, i, j):
     diff_list = list(set(complete_list) - set(value_list))
     return diff_list
 
+
 def only_square(board: SudokuBoard):
     """"
-    Executes a move on the board according to the "only square" rule
-    if it is legal move.
-    @param board: A sudoku board. It contains the current position of a game.
-    @param i: An index of a row in the range [0, ..., N]
-    @param i: An index of a column in the range [0, ..., N]
+    Executes a move on the board according to the "only square" rule if it is legal move.
+    @param board: A sudoku board. It contains the current position of a Sudoku game.
     """
     empty_cells = list_empty_cells(board)
     # Get all empty cells on the board
@@ -115,8 +118,66 @@ def only_square(board: SudokuBoard):
         missing_values = missing_value_group(board, i, j)
         # convert them into coordinates and get the smallest list of missing values
         for value in missing_values:
-            if (check_legal_column(board, j, value) == True and check_legal_row(board, i, value) == True and check_legal_region(board, i , j, value) == True):
+            if (check_legal_column(board, j, value)
+                    and check_legal_row(board, i, value)
+                    and check_legal_region(board, i, j, value)):
                 # executes the move but we can also just add it to a list
                 board.put(i, j, value)
             else:
                 pass
+
+
+# HIDDEN TWIN EXCLUSION HEURISTIC ##################################################
+def calculate_region_index(board: SudokuBoard, m, n):
+    row_region_index = (m // board.m) * board.m
+    column_region_index = (n // board.n) * board.n
+
+    return row_region_index, column_region_index
+
+
+def hidden_twin_exclusion(board: SudokuBoard, moves: list):
+    """
+    Returns a filtered list of moves using the hidden twin exclusion.
+    @param board: A sudoku board. It contains the current position of a game.
+    @param moves: A list of moves to evaluate.
+    """
+    filtered_moves = []
+    new_taboo_result = None
+    potential_twins = {}
+    twins = {}
+
+    # Store the moves in a dictionary where the key is the position of the move
+    # and the value is a list of possible values
+    for m in moves:
+        position = (m.i, m.j)
+        if position in potential_twins:
+            potential_twins[position].append(m.value)
+        else:
+            potential_twins[position] = [m.value]
+
+    # Check if the potential twins are valid by comparing for each position the possible values
+    for k, v in potential_twins.items():
+        for k_, v_ in potential_twins.items():
+            # Check if the two positions are not the same and that they are in the same region
+            if k != k_ and calculate_region_index(board, k[0], k[1]) == calculate_region_index(board, k_[0], k_[1]):
+                intersection = set(v) & set(v_)
+                if len(intersection) == 2:
+                    twins[k] = list(intersection)
+                    twins[k_] = list(intersection)
+            else:
+                continue
+
+    # Filter out moves using the twins
+    for move in moves:
+        key = (move.i, move.j)
+        if key in twins:
+            if move.value in twins[key]:
+                filtered_moves.append(move)
+            elif new_taboo_result is not None:
+                # We have found a move that will get rejected by the Oracle and will be placed on the taboo list
+                # This is very valuable, so we store it (But we don't need more than 1)
+                new_taboo_result = move
+        else:
+            filtered_moves.append(move)
+
+    return filtered_moves, new_taboo_result
