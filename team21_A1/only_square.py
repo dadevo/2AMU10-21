@@ -115,6 +115,7 @@ def only_square(board: SudokuBoard):
         # convert them into coordinates and get the smallest list of missing values
         for value in missing_values:
             if (check_legal_column(board, j, value) == True and check_legal_row(board, i, value) == True and check_legal_region(board, i , j, value) == True):
+                # executes the move but we can also just add it to a list
                 board.put(i, j, value)
             else:
                 pass
