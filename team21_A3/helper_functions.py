@@ -2,6 +2,52 @@ from competitive_sudoku.sudoku import Move, SudokuBoard, TabooMove
 import copy
 
 
+def find_row(board: SudokuBoard, m):
+    """
+    Returns a list of values in a specific row.
+    @param board: A sudoku board. It contains the current position of a game.
+    @param m: A row value in the range [0, ..., N).
+    """
+    row = []
+
+    for n in range(board.N):
+        row.append(board.get(m, n))
+
+    return row
+
+
+def find_column(board: SudokuBoard, n):
+    """
+    Returns a list of values for a column.
+    @param board: A sudoku board. It contains the current position of a game.
+    @param n: A column value in the range [0, ..., N).
+    """
+    column = []
+
+    for m in range(board.N):
+        column.append(board.get(m, n))
+
+    return column
+
+
+def find_region(board: SudokuBoard, m, n):
+    """
+    Returns a list of values for a region.
+    @param board: A sudoku board. It contains the current position of a game.
+    @param m: A row value in the range [0, ..., N).
+    @param n: A column value in the range [0, ..., N).
+    """
+    row_region_index = (m // board.m) * board.m
+    column_region_index = (n // board.n) * board.n
+    region = []
+
+    for m_i in range(row_region_index, row_region_index + board.m):
+        for n_i in range(column_region_index, column_region_index + board.n):
+            region.append(board.get(m_i, n_i))
+
+    return region
+
+
 def check_legal_row(board: SudokuBoard, m, value):
     """
     Returns whether a value is legal for a row.
@@ -9,12 +55,8 @@ def check_legal_row(board: SudokuBoard, m, value):
     @param m: A row value in the range [0, ..., N).
     @param value: A value for a square.
     """
-    row = []
 
-    for n in range(board.N):
-        row.append(board.get(m, n))
-
-    return value not in row
+    return value not in find_row(board, m)
 
 
 def check_legal_column(board: SudokuBoard, n, value):
@@ -24,12 +66,8 @@ def check_legal_column(board: SudokuBoard, n, value):
     @param n: A column value in the range [0, ..., N).
     @param value: A value for a square.
     """
-    column = []
 
-    for m in range(board.N):
-        column.append(board.get(m, n))
-
-    return value not in column
+    return value not in find_column(board, n)
 
 
 def check_legal_region(board: SudokuBoard, m, n, value):
@@ -40,15 +78,8 @@ def check_legal_region(board: SudokuBoard, m, n, value):
     @param n: A column value in the range [0, ..., N).
     @param value: The number that we want to put on the board
     """
-    row_region_index = (m // board.m) * board.m
-    column_region_index = (n // board.n) * board.n
-    region = []
 
-    for m_i in range(row_region_index, row_region_index + board.m):
-        for n_i in range(column_region_index, column_region_index + board.n):
-            region.append(board.get(m_i, n_i))
-
-    return value not in region
+    return value not in find_region(board, m, n)
 
 
 def is_empty_cell(board: SudokuBoard, m, n):
