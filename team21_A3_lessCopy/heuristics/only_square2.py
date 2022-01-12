@@ -1,6 +1,6 @@
 import numpy as np
 from competitive_sudoku.sudoku import SudokuBoard, Move
-from team21_A3.helper_functions import is_empty_cell, find_row, find_column, find_region
+from team21_A3_lessCopy.helper_functions import is_empty_cell, find_row, find_column, find_region
 
 
 def remove_possible_value_row(board, m, value):
@@ -86,7 +86,7 @@ def initialize_board(board: SudokuBoard):
     for m in range(0, board.N):
         for n in range(0, board.N):
             if is_empty_cell(board, m, n):
-                all_moves = list(range(1, board.N + 1))
+                all_moves = list(range(1, board.N+1))
                 possible_values = [x for x in all_moves if x not in find_row(board, m)
                                    and x not in find_column(board, n)
                                    and x not in find_region(board, m, n)]
@@ -136,8 +136,7 @@ def only_square(board: SudokuBoard, taboo_moves):
             possible_values = possible_values_board[m][n]
             if possible_values is not None:  # None means its an already filled-in square
                 if len(possible_values) == 1:
-                    possible_values_board = only_square_possibilities_remover(board, possible_values_board, m, n,
-                                                                              possible_values[0])
+                    possible_values_board = only_square_possibilities_remover(board, possible_values_board, m, n, possible_values[0])
 
     # Finally, we convert the Numpy matrix into a list of possible & legal moves
     return convert_matrix_into_moves(possible_values_board, taboo_moves)
