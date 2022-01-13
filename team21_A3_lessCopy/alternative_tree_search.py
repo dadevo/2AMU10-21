@@ -3,7 +3,7 @@ from team21_A3_lessCopy.evaluation import evaluate_move
 from team21_A3_lessCopy.heuristics.hidden_twin_exclusion import hidden_twin_exclusion
 from team21_A3_lessCopy.heuristics.only_square2 import only_square
 from competitive_sudoku.sudoku import SudokuBoard
-
+import random
 import copy
 
 class Node:
@@ -240,7 +240,12 @@ def get_heuristic_moves(game_board: SudokuBoard, taboo_moves):
     @param taboo_moves: The list of moves declared taboo by the Oracle
     """
 
+    # We create the initial list of possible moves using the Only Square Sudoku rule
     filtered_moves = only_square(game_board, taboo_moves)
+
+    # We then shuffle this list, so that our agent doesn't just fill in the top-left/bottom-right corner,
+    # because that looks stupid (and funny).
+    random.shuffle(filtered_moves)
 
     future_taboo_moves = None
 
